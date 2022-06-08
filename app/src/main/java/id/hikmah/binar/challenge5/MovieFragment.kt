@@ -9,13 +9,10 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import id.hikmah.binar.challenge5.adapter.MovieAdapter
 import id.hikmah.binar.challenge5.databinding.FragmentMovieBinding
-import id.hikmah.binar.challenge5.model.MovieItem
-import id.hikmah.binar.challenge5.model.ResultMovie
 import id.hikmah.binar.challenge5.service.APIClient
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.util.zip.Inflater
 
 class MovieFragment : Fragment() {
 

@@ -1,5 +1,6 @@
 package id.hikmah.binar.challenge5.service
 
+import id.hikmah.binar.challenge5.BuildConfig
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -8,7 +9,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 object APIClient {
 
     //base url untuk hit API, cons val
-    const val BASE_URL = "https://api.themoviedb.org/3/movie/"
+    const val BASE_URL = BuildConfig.BASE_URL_TMDB
 
     // untuk interceptor di level body
     private val logging : HttpLoggingInterceptor

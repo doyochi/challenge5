@@ -3,7 +3,7 @@ package id.hikmah.binar.challenge5.model
 
 import com.google.gson.annotations.SerializedName
 
-data class ResultMovie(
+data class Result(
     @SerializedName("adult")
     val adult: Boolean,
     @SerializedName("backdrop_path")

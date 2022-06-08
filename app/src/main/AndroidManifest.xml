@@ -12,6 +12,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Challenge5">
         <activity
+            android:name=".LoginRegActivity"
+            android:exported="false" />
+        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
