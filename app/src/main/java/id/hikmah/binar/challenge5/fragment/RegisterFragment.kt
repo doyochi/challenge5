@@ -1,39 +1,27 @@
 package id.hikmah.binar.challenge5.fragment
 
+import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import dagger.hilt.android.AndroidEntryPoint
-import id.hikmah.binar.challenge6.R
-import id.hikmah.binar.challenge6.database.UserEntity
-import id.hikmah.binar.challenge6.databinding.FragmentRegisterBinding
-import id.hikmah.binar.challenge6.repo.DataStoreRepo
-import id.hikmah.binar.challenge6.viewmodel.RegisterViewModel
-import id.hikmah.binar.challenge6.viewModelsFactory
-import id.hikmah.binar.challenge6.viewmodel.DataStoreViewModel
+import id.hikmah.binar.challenge5.R
+import id.hikmah.binar.challenge5.database.UserRepo
+import id.hikmah.binar.challenge5.databinding.FragmentRegisterBinding
+import id.hikmah.binar.challenge5.viewModelsFactory
+import id.hikmah.binar.challenge5.viewmodel.RegisterViewModel
 
-@AndroidEntryPoint
-class RegisterFragment : Fragment() {
+class RegisterFragment() : Fragment() {
 
     private var _binding: FragmentRegisterBinding? = null
     private val binding get() = _binding!!
 
-//    private val userRepo: UserRepo by lazy { UserRepo(requireContext()) }
-    private val registerViewModel: RegisterViewModel by viewModels()
-
-    private val pref: DataStoreRepo by lazy { DataStoreRepo(requireContext()) }
-    private val dataStoreViewModel: DataStoreViewModel by viewModelsFactory { DataStoreViewModel(pref) }
-
-//    private val viewModel: RegisterViewModel by viewModels {
-//        UserViewModelFactory(
-//            (activity?.application as UserApplication).database.userDao()
-//        )
-//    }
+    private val userRepo: UserRepo by lazy { UserRepo(requireContext()) }
+    private val sharedPrefs by lazy { context?.getSharedPreferences("SHARED_PREFS", Context.MODE_PRIVATE) }
+    private val viewModel: RegisterViewModel by viewModelsFactory { RegisterViewModel(userRepo, sharedPrefs) }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -59,59 +47,70 @@ class RegisterFragment : Fragment() {
     }
 
     private fun actionRegister() {
-        binding.btnDaftar.setOnClickListener{
-            val etUsername = binding.editUsername.text.toString()
-            val etEmail = binding.editEmail.text.toString()
-            val etPassworda = binding.editPassword1.text.toString()
-            val etPasswordb = binding.editPassword2.text.toString()
+        binding.btnDaftar.setOnClickListener {
+            // Get value dari TextEditText
+            val etUsername = binding.editUsername.editableText.toString()
+            val etEmail = binding.editEmail.editableText.toString()
+            val etPassword1 = binding.editPassword1.editableText.toString()
+            val etPassword2 = binding.editPassword2.editableText.toString()
 
-            if (validateRegisterInput(etUsername, etEmail, etPassworda, etPasswordb)) {
-                val user = UserEntity(null, etUsername,etEmail,etPassworda)
-                registerViewModel.addUserToDb(etUsername,etEmail,user)
+            // Validasi inputan jika tidak ada yg kosong / jml karakter terpenuhi
+            if (registerValidation(etUsername, etEmail, etPassword1, etPassword2)) {
+                // Jalankan fungsi addUser di ViewModel
+                viewModel.addUserToDb(etUsername, etEmail, etPassword1)
             }
         }
 
     }
 
-    private fun validateRegisterInput(username: String, email: String, passworda: String, passwordb: String): Boolean {
-
-        if (username.isEmpty()) {
-            binding.editUsername.error = "Username harus diisi"
-            return false
+    private fun registerValidation(username: String, email: String, pass1: String, pass2: String): Boolean {
+        var result = true
+        if (username.isEmpty()) { // jika kosong
+            binding.editUsername.error = "Username tidak boleh kosong!"
+            result = false
+        } else if (username.length < 5) { // jika kurang dari 5 karakter
+            binding.editUsername.error = "Minimum 5 karakter!"
+            result = false
+        } else {
         }
 
-        if (email.isEmpty()) {
-            binding.editEmail.error = "Email harus diisi"
-            return false
+        if (email.isEmpty()) { // jika kosong
+            binding.editEmail.error = "Email tidak boleh kosong!"
+            result = false
+        } else {
         }
 
-        if (passworda.isEmpty()) {
-            binding.editPassword1.error = "Password harus diisi"
-            return false
+        if (pass1.isEmpty()) { // jika kosong
+            binding.editPassword1.error = "Password tidak boleh kosong!"
+            result = false
+        } else if (pass1.length < 6) { // jika kurang dari 6 karakter
+            binding.editPassword1.error = "Password minimum 6 Karakter!"
+            result = false
+        } else {
         }
 
-        if (passwordb.isEmpty()) {
-            binding.editPassword2.error = "Silahkan konfirmasi password"
-            return false
+        if (pass2.isEmpty()) { // jika kosong
+            binding.editPassword2.error = "Konfirmasi Password tidak boleh kosong!"
+            result = false
+        } else if (pass2 != pass1) { // jika konfirm pass tdk sama dgn pass
+            binding.editPassword2.error = "Password harus sama!"
+            result = false
+        } else {
         }
 
-        if (passworda != passwordb) {
-            binding.editPassword1.error = "Password yang Anda masukkan tidak cocok"
-            return false
-        }
-        return true
+        return result
     }
 
     private fun observeData() {
-        registerViewModel.userIsRegist.observe(viewLifecycleOwner) {
+        viewModel.userIsRegist.observe(viewLifecycleOwner) {
             binding.editUsername.error = "Username sudah dipakai"
         }
 
-        registerViewModel.emailIsRegist.observe(viewLifecycleOwner) {
+        viewModel.emailIsRegist.observe(viewLifecycleOwner) {
             binding.editEmail.error = "Email sudah dipakai"
         }
 
-        registerViewModel.isRegist.observe(viewLifecycleOwner) {
+        viewModel.isRegist.observe(viewLifecycleOwner) {
             if (it == false) {
                 Toast.makeText(requireContext(), "Gagal Daftar", Toast.LENGTH_SHORT).show()
             } else {

@@ -8,15 +8,15 @@ class UserRepo(context: Context) {
 
     private val userDb = UserDatabase.getInstance(context)
 
-    suspend fun checkRegisteredkUsername(username: String){
+    suspend fun checkRegisteredkUsername(username: String) = withContext(Dispatchers.IO){
         userDb?.userDao()?.checkRegisteredUsername(username)
     }
 
-    suspend fun checkRegisteredEmail(email: String){
+    suspend fun checkRegisteredEmail(email: String) = withContext(Dispatchers.IO){
         userDb?.userDao()?.checkRegisteredEmail(email)
     }
 
-    suspend fun isLogin(email: String, password: String){
+    suspend fun isLogin(email: String, password: String)= withContext(Dispatchers.IO){
         userDb?.userDao()?.isLogin(email, password)
     }
     //

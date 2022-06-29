@@ -1,5 +1,6 @@
 package id.hikmah.binar.challenge5.viewmodel
 
+import android.content.SharedPreferences
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -7,17 +8,18 @@ import id.hikmah.binar.challenge5.database.UserEntity
 import id.hikmah.binar.challenge5.database.UserRepo
 import kotlinx.coroutines.launch
 
-class RegisterViewModel (private val userRepo: UserRepo): ViewModel() {
+class RegisterViewModel (private val userRepo: UserRepo, private val sharedPrefs: SharedPreferences?): ViewModel() {
 
     val isRegist = MutableLiveData<Boolean>()
     val emailIsRegist = MutableLiveData<Boolean>()
     val userIsRegist = MutableLiveData<Boolean>()
 
-    fun addUserToDb(username: String, email: String, user: UserEntity) {
+    fun addUserToDb(username: String, email: String, password: String) {
         var result1 = false
         var result2 = false
 
         viewModelScope.launch {
+            val user = UserEntity(null, username, email, password)
 
             // Query check username & email
             val checkUsername = userRepo.checkRegisteredkUsername(username)
@@ -34,7 +36,7 @@ class RegisterViewModel (private val userRepo: UserRepo): ViewModel() {
             } else {
                 result2 = true
             }
-// Jika username & email tersedia
+
             if (result1 && result2) {
                 isRegist.value = true
                 // Jalankan query insert to db
