@@ -8,12 +8,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import id.hikmah.binar.challenge5.BuildConfig
 import id.hikmah.binar.challenge5.databinding.ItemDataBinding
-import id.hikmah.binar.challenge5.databinding.ItemMovieBinding
-import id.hikmah.binar.challenge5.model.MovieResponse
+import id.hikmah.binar.challenge5.model.MoviePopularResponse
 import id.hikmah.binar.challenge5.model.Result
 
-class MovieAdapter(private val onClickListers: (id: Int, movie: Result) -> Unit):
-    RecyclerView.Adapter<MovieAdapter.MovieViewHolder>(){
+class TMDBAdapter(private val onClickListers: (id: Int, movie: Result) -> Unit):
+    RecyclerView.Adapter<TMDBAdapter.MovieViewHolder>(){
 
     val diffCallback = object : DiffUtil.ItemCallback<Result>() {
         override fun areItemsTheSame(oldItem: Result, newItem: Result): Boolean {
@@ -28,7 +27,7 @@ class MovieAdapter(private val onClickListers: (id: Int, movie: Result) -> Unit)
 
     private var differ = AsyncListDiffer(this, diffCallback)
 
-    fun updateDataRecycler(movies: MovieResponse?) = differ.submitList(movies?.results)
+    fun updateDataRecycler(movies: MoviePopularResponse?) = differ.submitList(movies?.results)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MovieViewHolder {
         val binding = ItemDataBinding.inflate(LayoutInflater.from(parent.context), parent, false)

@@ -4,7 +4,7 @@ import android.content.SharedPreferences
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import id.hikmah.binar.challenge5.database.ProfilEntity
+import id.hikmah.binar.challenge5.database.UserDetail
 import id.hikmah.binar.challenge5.database.UserRepo
 import kotlinx.coroutines.launch
 
@@ -45,7 +45,7 @@ class HomeViewModel(private val userRepo: UserRepo, private val sharedPrefs: Sha
 
     fun updateUserDetail(username: String, namaLengkap: String, tglLahir: String, alamat: String) {
         viewModelScope.launch {
-            val profilEntity = ProfilEntity(null, username, namaLengkap, tglLahir, alamat)
+            val userDetail = UserDetail(null, username, namaLengkap, tglLahir, alamat)
             val result = userRepo.getUserDetail(username)
             if (!result.isNullOrEmpty()) { // Jika datanya sudah ada
                 // Jalankan query Update UserDetail
@@ -53,7 +53,7 @@ class HomeViewModel(private val userRepo: UserRepo, private val sharedPrefs: Sha
                 statusUpdateProfile.value = true
             } else { // Jika datanya belum ada
                 // Tambahkan data baru pada tabel UserDetail
-                userRepo.insertUserDetail(profilEntity)
+                userRepo.insertUserDetail(userDetail)
                 statusUpdateProfile.value = true
             }
         }

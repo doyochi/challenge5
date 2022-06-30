@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/movieFragment"
-        android:name="id.hikmah.binar.challenge5.MovieFragment"
+        android:name="id.hikmah.binar.challenge5.fragment.DetailMovieFragment"
         android:label="fragment_movie"
         tools:layout="@layout/fragment_movie" />
     <fragment

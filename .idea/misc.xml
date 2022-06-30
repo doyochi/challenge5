@@ -3,8 +3,11 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/HP/Documents/StudiIndependen_Android/chapter5/challenge5/app/src/main/res/drawable/ic_profil.xml" value="0.107" />
         <entry key="..\:/Users/HP/Documents/StudiIndependen_Android/chapter5/challenge5/app/src/main/res/layout/activity_login_reg.xml" value="0.1" />
         <entry key="..\:/Users/HP/Documents/StudiIndependen_Android/chapter5/challenge5/app/src/main/res/layout/activity_main.xml" value="0.1" />
+        <entry key="..\:/Users/HP/Documents/StudiIndependen_Android/chapter5/challenge5/app/src/main/res/layout/fragment_home.xml" value="0.264" />
+        <entry key="..\:/Users/HP/Documents/StudiIndependen_Android/chapter5/challenge5/app/src/main/res/layout/fragment_login.xml" value="0.25" />
         <entry key="..\:/Users/HP/Documents/StudiIndependen_Android/chapter5/challenge5/app/src/main/res/layout/fragment_movie.xml" value="0.18385416666666668" />
         <entry key="..\:/Users/HP/Documents/StudiIndependen_Android/chapter5/challenge5/app/src/main/res/layout/fragment_profil.xml" value="0.1" />
         <entry key="..\:/Users/HP/Documents/StudiIndependen_Android/chapter5/challenge5/app/src/main/res/layout/fragment_register.xml" value="0.146875" />

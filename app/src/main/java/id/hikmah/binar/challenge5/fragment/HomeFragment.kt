@@ -1,5 +1,6 @@
 package id.hikmah.binar.challenge5.fragment
 
+import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -9,66 +10,60 @@ import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import dagger.hilt.EntryPoint
-import dagger.hilt.android.AndroidEntryPoint
-import id.hikmah.binar.challenge5.adapter.MovieAdapter
+import id.hikmah.binar.challenge5.adapter.TMDBAdapter
 import id.hikmah.binar.challenge5.database.UserRepo
 import id.hikmah.binar.challenge5.databinding.FragmentHomeBinding
-import id.hikmah.binar.challenge6.BuildConfig
-import id.hikmah.binar.challenge6.R
-import id.hikmah.binar.challenge6.adapter.TMDBAdapter
-import id.hikmah.binar.challenge6.databinding.FragmentHomeBinding
-import id.hikmah.binar.challenge6.repo.DataStoreRepo
-import id.hikmah.binar.challenge6.repo.MovieRepo
-import id.hikmah.binar.challenge6.service.TMDBApiService
-import id.hikmah.binar.challenge6.service.TMDBClient
-import id.hikmah.binar.challenge6.model.Result
-import id.hikmah.binar.challenge6.model.Status
-import id.hikmah.binar.challenge6.viewmodel.DataStoreViewModel
-import id.hikmah.binar.challenge6.viewmodel.MovieViewModel
-import id.hikmah.binar.challenge6.viewModelsFactory
+import id.hikmah.binar.challenge5.BuildConfig
+import id.hikmah.binar.challenge5.R
+import id.hikmah.binar.challenge5.model.Result
+import id.hikmah.binar.challenge5.service.TMDBApiService
+import id.hikmah.binar.challenge5.service.TMDBClient
+import id.hikmah.binar.challenge5.viewmodel.TMDBViewModel
+import id.hikmah.binar.challenge5.viewModelsFactory
+import id.hikmah.binar.challenge5.viewmodel.HomeViewModel
 
 class HomeFragment : Fragment() {
-
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var tmdbAdapter: MovieAdapter
+    private lateinit var tmdbAdapter: TMDBAdapter
 
-    private val pref: UserRepo by lazy { UserRepo(requireContext()) }
-    private val dataStoreViewModel: DataStoreViewModel by viewModelsFactory{ DataStoreViewModel(pref) }
+    private val userRepo: UserRepo by lazy { UserRepo(requireContext()) }
+    private val sharedPrefs by lazy { context?.getSharedPreferences("SHARED_PREFS", Context.MODE_PRIVATE) }
+    private val viewModel: HomeViewModel by viewModelsFactory { HomeViewModel(userRepo, sharedPrefs) }
 
-    private val tmdbApiService: TMDBApiService by lazy { TMDBClient.instance }
-    private val movieRepo: MovieRepo by lazy { MovieRepo(tmdbApiService) }
-    private val movieViewModel: MovieViewModel by viewModelsFactory { MovieViewModel(movieRepo) }
+    private val apiService : TMDBApiService by lazy { TMDBClient.instance }
+    private val tmdbViewModel: TMDBViewModel by viewModelsFactory { TMDBViewModel(apiService) }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         initRecyclerView()
+        viewModel.getUsername()
+        tmdbViewModel.getAllMoviePopular()
         moveToProfile()
-        showUsername()
-        observeMovie()
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
+        observeData()
     }
 
     private fun initRecyclerView() {
-        tmdbAdapter = TMDBAdapter { id_movies,movies: Result ->
-            val bundle = Bundle()
-            bundle.putInt("id _film", id_movies)
-            findNavController().navigate(R.id.action_homeFragment_to_profilFragment, bundle)
+        tmdbAdapter = TMDBAdapter { id_momovie,pilem: Result ->
+            val bandel = Bundle()
+            bandel.putInt("aidi_pilem", id_momovie)
+            findNavController().navigate(R.id.action_homeFragment_to_detailMovieFragment, bandel)
         }
         binding.apply {
             rvData.adapter = tmdbAdapter
@@ -77,38 +72,21 @@ class HomeFragment : Fragment() {
     }
 
     private fun moveToProfile() {
-        binding.btnAccount.setOnClickListener {
+        binding.btnProfil.setOnClickListener {
             findNavController().navigate(R.id.action_homeFragment_to_profilFragment)
         }
     }
 
-    private fun showUsername() {
-        dataStoreViewModel.getUsername().observe(viewLifecycleOwner) {
+    private fun observeData() {
+        viewModel.showUsername.observe(viewLifecycleOwner) {
+            // Show username di Toolbar
             binding.txtWelcomeUser.text = "Welcome, $it"
         }
-    }
-
-    private fun observeMovie() {
-        movieViewModel.getAllMoviePopular(BuildConfig.API_KEY).observe(viewLifecycleOwner) {
-            when (it.status) {
-                Status.LOADING -> {
-                    // Handle ketika data loading
-                    // progress bar muncul
-                    binding.pb.isVisible = true
-                }
-                Status.SUCCESS -> {
-                    // Handle ketika data success
-                    // progress bar ilang
-                    binding.pb.isVisible = false
-                    tmdbAdapter.updateDataRecycler(it.data)
-                }
-                Status.ERROR -> {
-                    // Handle ketika data error
-                    // progress bar ilang
-                    binding.pb.isVisible = false
-                    Toast.makeText(requireContext(), "Error", Toast.LENGTH_SHORT).show()
-                }
-            }
+        tmdbViewModel.dataSuccess.observe(viewLifecycleOwner) {
+            tmdbAdapter.updateDataRecycler(it)
+        }
+        tmdbViewModel.dataError.observe(viewLifecycleOwner) {
+            Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
         }
     }
 }

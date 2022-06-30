@@ -12,7 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Challenge5">
         <activity
-            android:name=".LoginRegActivity"
+            android:name=".AuthActivity"
             android:exported="false" />
         <activity
             android:name=".MainActivity"

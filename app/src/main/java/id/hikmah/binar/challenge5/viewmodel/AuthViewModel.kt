@@ -4,13 +4,13 @@ import android.content.SharedPreferences
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import id.hikmah.binar.challenge5.database.UserEntity
+import id.hikmah.binar.challenge5.database.User
 import id.hikmah.binar.challenge5.database.UserRepo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class LoginViewModel (private val userRepo: UserRepo, private val sharedPref: SharedPreferences?): ViewModel() {
+class AuthViewModel(private val userRepo: UserRepo, private val sharedPrefs: SharedPreferences?): ViewModel() {
 
     val statusUsername = MutableLiveData<Boolean>()
     val statusEmail = MutableLiveData<Boolean>()
@@ -21,18 +21,19 @@ class LoginViewModel (private val userRepo: UserRepo, private val sharedPref: Sh
         var result1 = false
         var result2 = false
         viewModelScope.launch {
-            val user = UserEntity(null, username, email, password)
+            val user = User(null, username, email, password)
 
             // Query check username & email
-            val checkUsername = userRepo.checkRegisteredkUsername(username)
-            val checkEmail = userRepo.checkRegisteredEmail(email)
+            val checkUsername = userRepo.cekUsername(username)
+            val checkEmail = userRepo.cekEmail(email)
 
-            if (!checkUsername.isNullOrEmpty()) {
+            if (!checkUsername.isNullOrEmpty()) { // jika ditemukan username sudah dipakai
                 statusUsername.value = false
             } else {
                 result1 = true
             }
-            if (!checkEmail.isNullOrEmpty()) {
+
+            if (!checkEmail.isNullOrEmpty()) { // jika ditemukan email sudah dipakai
                 statusEmail.value = false
             } else {
                 result2 = true
@@ -51,7 +52,7 @@ class LoginViewModel (private val userRepo: UserRepo, private val sharedPref: Sh
     fun loginUser(email: String, password: String) {
         viewModelScope.launch {
             // Query check email dan password pada db
-            val checkUser = userRepo.isLogin(email, password)
+            val checkUser = userRepo.cekUser(email, password)
             // Mencari username dari inputan login
             val getUsername = userRepo.getUsernameByMail(email)
 
@@ -60,7 +61,7 @@ class LoginViewModel (private val userRepo: UserRepo, private val sharedPref: Sh
                 // Simpan username ke variabel
                 val username = getUsername?.username
                 // Buat editor shared preferences
-                val editor = sharedPref?.edit()
+                val editor = sharedPrefs?.edit()
                 // Simpan ke sharedpref
                 editor?.apply {
                     putString("USERNAME", username)
@@ -74,4 +75,5 @@ class LoginViewModel (private val userRepo: UserRepo, private val sharedPref: Sh
             }
         }
     }
+
 }
