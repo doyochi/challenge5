@@ -2,7 +2,7 @@ package id.hikmah.binar.challenge5
 
 import android.content.Context
 
-class SharedPref(context: Context) {
+class SharedPrefs(context: Context) {
     private val sharedPref = context.getSharedPreferences("SHARED_PREFS", Context.MODE_PRIVATE)
 
     fun setUsername(username: String) {

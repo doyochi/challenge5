@@ -12,55 +12,51 @@ import id.hikmah.binar.challenge5.R
 import id.hikmah.binar.challenge5.database.UserRepo
 import id.hikmah.binar.challenge5.databinding.FragmentRegisterBinding
 import id.hikmah.binar.challenge5.viewModelsFactory
-import id.hikmah.binar.challenge5.viewmodel.RegisterViewModel
+import id.hikmah.binar.challenge5.viewmodel.AuthViewModel
 
-class RegisterFragment() : Fragment() {
-
+class RegisterFragment : Fragment() {
     private var _binding: FragmentRegisterBinding? = null
     private val binding get() = _binding!!
 
     private val userRepo: UserRepo by lazy { UserRepo(requireContext()) }
     private val sharedPrefs by lazy { context?.getSharedPreferences("SHARED_PREFS", Context.MODE_PRIVATE) }
-    private val viewModel: RegisterViewModel by viewModelsFactory { RegisterViewModel(userRepo, sharedPrefs) }
+    private val viewModel: AuthViewModel by viewModelsFactory { AuthViewModel(userRepo, sharedPrefs) }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
         _binding = FragmentRegisterBinding.inflate(inflater, container, false)
         return binding.root
     }
-
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
 
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        observeData()
-        actionRegister()
 
+        doRegister()
+        observeData()
     }
 
-    private fun actionRegister() {
+    private fun doRegister() {
         binding.btnDaftar.setOnClickListener {
             // Get value dari TextEditText
-            val etUsername = binding.editUsername.editableText.toString()
-            val etEmail = binding.editEmail.editableText.toString()
-            val etPassword1 = binding.editPassword1.editableText.toString()
-            val etPassword2 = binding.editPassword2.editableText.toString()
+            val etUsername = binding.editUsername.text.toString()
+            val etEmail = binding.editEmail.text.toString()
+            val etPassword1 = binding.editPassword1.text.toString()
+            val etPassword2 = binding.editPassword2.text.toString()
 
             // Validasi inputan jika tidak ada yg kosong / jml karakter terpenuhi
             if (registerValidation(etUsername, etEmail, etPassword1, etPassword2)) {
                 // Jalankan fungsi addUser di ViewModel
-                viewModel.addUserToDb(etUsername, etEmail, etPassword1)
+                viewModel.addUser(etUsername, etEmail, etPassword1)
             }
         }
-
     }
 
     private fun registerValidation(username: String, email: String, pass1: String, pass2: String): Boolean {
@@ -72,12 +68,14 @@ class RegisterFragment() : Fragment() {
             binding.editUsername.error = "Minimum 5 karakter!"
             result = false
         } else {
+            binding.editUsername
         }
 
         if (email.isEmpty()) { // jika kosong
             binding.editEmail.error = "Email tidak boleh kosong!"
             result = false
         } else {
+            binding.editEmail
         }
 
         if (pass1.isEmpty()) { // jika kosong
@@ -87,6 +85,7 @@ class RegisterFragment() : Fragment() {
             binding.editPassword1.error = "Password minimum 6 Karakter!"
             result = false
         } else {
+            binding.editPassword1
         }
 
         if (pass2.isEmpty()) { // jika kosong
@@ -96,29 +95,35 @@ class RegisterFragment() : Fragment() {
             binding.editPassword2.error = "Password harus sama!"
             result = false
         } else {
+            binding.editPassword2
         }
 
         return result
     }
 
     private fun observeData() {
-        viewModel.userIsRegist.observe(viewLifecycleOwner) {
-            binding.editUsername.error = "Username sudah dipakai"
+        viewModel.statusUsername.observe(viewLifecycleOwner) {
+            if (it == false) {
+                binding.editUsername.error = "Username sudah dipakai"
+            }
         }
 
-        viewModel.emailIsRegist.observe(viewLifecycleOwner) {
-            binding.editEmail.error = "Email sudah dipakai"
+        viewModel.statusEmail.observe(viewLifecycleOwner) {
+            if (it == false) {
+                binding.editEmail.error = "Email sudah dipakai"
+            }
         }
 
-        viewModel.isRegist.observe(viewLifecycleOwner) {
+        viewModel.statusRegistration.observe(viewLifecycleOwner) {
             if (it == false) {
                 Toast.makeText(requireContext(), "Gagal Daftar", Toast.LENGTH_SHORT).show()
             } else {
                 findNavController().navigate(R.id.action_registerFragment_to_loginFragment)
                 Toast.makeText(requireContext(), "Berhasil Daftar", Toast.LENGTH_SHORT).show()
-//                binding.editUsername.error = false
-//                binding.editEmail.error = false
+//                binding.editUsername.isErrorEnabled = false
+//                binding.editEmail.isErrorEnabled = false
             }
         }
     }
+
 }

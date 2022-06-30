@@ -5,7 +5,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity
-data class ProfilEntity (
+data class UserDetail(
     @PrimaryKey(autoGenerate = true) var id: Int?,
     @ColumnInfo(name = "username") val username: String?,
     @ColumnInfo(name = "nama_lengkap") val nama_lengkap: String?,

@@ -8,12 +8,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import id.hikmah.binar.challenge5.BuildConfig
 import id.hikmah.binar.challenge5.databinding.ItemDataBinding
-import id.hikmah.binar.challenge5.databinding.ItemMovieBinding
-import id.hikmah.binar.challenge5.model.MovieResponse
+import id.hikmah.binar.challenge5.model.MoviePopularResponse
 import id.hikmah.binar.challenge5.model.Result
 
-class MovieAdapter(private val onClickListers: (id: Int, movie: Result) -> Unit):
-    RecyclerView.Adapter<MovieAdapter.MovieViewHolder>(){
+class TMDBAdapter(private val onClickListenerUyee: (aidi: Int, Result) -> Unit):
+    RecyclerView.Adapter<TMDBAdapter.TMDBViewHolder>() {
 
     val diffCallback = object : DiffUtil.ItemCallback<Result>() {
         override fun areItemsTheSame(oldItem: Result, newItem: Result): Boolean {
@@ -28,20 +27,20 @@ class MovieAdapter(private val onClickListers: (id: Int, movie: Result) -> Unit)
 
     private var differ = AsyncListDiffer(this, diffCallback)
 
-    fun updateDataRecycler(movies: MovieResponse?) = differ.submitList(movies?.results)
+    fun updateDataRecycler(movies: MoviePopularResponse?) = differ.submitList(movies?.results)
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MovieViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TMDBViewHolder {
         val binding = ItemDataBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return MovieViewHolder(binding)
+        return TMDBViewHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: MovieViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: TMDBViewHolder, position: Int) {
         holder.bind(differ.currentList[position])
     }
 
     override fun getItemCount(): Int = differ.currentList.size
 
-    inner class MovieViewHolder(private val binding: ItemDataBinding): RecyclerView.ViewHolder(binding.root) {
+    inner class TMDBViewHolder(private val binding: ItemDataBinding): RecyclerView.ViewHolder(binding.root) {
         fun bind(item: Result) {
             binding.cardTitleValue.text = item.title
             binding.cardOverviewValue.text = item.overview
@@ -50,7 +49,7 @@ class MovieAdapter(private val onClickListers: (id: Int, movie: Result) -> Unit)
                 .into(binding.thumbMovie)
 
             binding.itemData.setOnClickListener {
-                onClickListers.invoke(item.id, item)
+                onClickListenerUyee.invoke(item.id, item)
             }
         }
     }
